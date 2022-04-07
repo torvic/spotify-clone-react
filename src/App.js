@@ -1,23 +1,35 @@
-import logo from './logo.svg';
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable react/jsx-filename-extension */
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import SpotifyWebApi from 'spotify-web-api-js';
+import Login from './components/Login';
+import { getTokenFromUrl } from './components/spotify';
+
+const spotify = new SpotifyWebApi();
 
 function App() {
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const hash = getTokenFromUrl();
+    window.location.hash = '';
+    const _token = hash.access_token;
+
+    if (_token) {
+      setToken(_token);
+
+      spotify.setAccessToken(_token);
+
+      spotify.getMe().then((user) => {
+        console.log('🚀 ~ file: App.js ~ line 26 ~ spotify.getMe ~ user', user);
+      });
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="">
+      {token ? (<h1>I am logged in</h1>) : <Login />}
     </div>
   );
 }
